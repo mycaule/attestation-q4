@@ -1,0 +1,19 @@
+{
+  "name": "attestation-q4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mycaule/attestation-q4.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "pdf-lib": "^1.11.2",
+    "qrcode": "^1.4.4"
+  }
+}
