@@ -11,20 +11,21 @@ const profile = require('./profile.json')
 
 const start = async () => {
     const now = new Date()
-    const reasons = "achats"
+    const reasons = ["achats"]
 
     profile.datesortie = `${("0" + (now.getDay() + 1)).slice(-2)}/${("0" + (now.getMonth() + 1)).slice(-2)}/${now.getFullYear()}`
     profile.heuresortie = `${("0" + now.getHours()).slice(-2)}:${("0" + now.getMinutes()).slice(-2)}`
 
     console.log(profile, reasons)
-    const pdfBytes = await generatePdf(profile, reasons, './templates/certificate.pdf')
+    const templateName = "./templates/certificate01.pdf"
+    const pdfBytes = await generatePdf(profile, reasons, templateName)
 
     const fileName = "./docs/attestation.pdf" // `docs/attestation-${creationDate}_${creationHour}.pdf`
     await writeFile(fileName, pdfBytes)
 }
 
 async function generatePdf(profile, reasons, pdfBase) {
-    const ys = { travail: 578, achats: 533, sante: 477, famille: 435, handicap: 396, sport_animaux: 358, convocation: 295, missions: 255, enfants: 211 }
+    const ys = { travail: 585, achats: 536, sante: 488, famille: 451, handicap: 415, sport_animaux: 391, convocation: 318, missions: 293, enfants: 269 }
 
     const { lastname, firstname, birthday, placeofbirth, address, zipcode, city, datesortie, heuresortie } = profile
 
@@ -35,8 +36,8 @@ async function generatePdf(profile, reasons, pdfBase) {
         `Naissance: ${birthday} a ${placeofbirth}`,
         `Adresse: ${address} ${zipcode} ${city}`,
         `Sortie: ${datesortie} a ${heuresortie}`,
-        `Motifs: ${reasons}`,
-    ].join(';\n ')
+        `Motifs: ${reasons.join(', ')}`
+    ].join(';\n') + ";"
 
     console.log(data)
 
@@ -56,30 +57,30 @@ async function generatePdf(profile, reasons, pdfBase) {
     const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica)
     const drawText = (text, x, y, size = 11) => page1.drawText(text, { x, y, size, font })
 
-    drawText(`${firstname} ${lastname}`, 119, 696)
-    drawText(birthday, 119, 674)
-    drawText(placeofbirth, 297, 674)
-    drawText(`${address} ${zipcode} ${city}`, 133, 652)
+    drawText(`${firstname} ${lastname}`, 137, 701)
+    drawText(birthday, 137, 683)
+    drawText(placeofbirth, 200, 683)
+    drawText(`${address} ${zipcode} ${city}`, 137, 664)
 
-    reasons.split(', ').forEach(reason => drawText('x', 78, ys[reason], 18))
+    reasons.forEach(reason => drawText('x', 72, ys[reason], 18))
 
-    drawText(profile.city, 105, 177, 11)
-    drawText(`${profile.datesortie}`, 91, 153, 11)
-    drawText(`${profile.heuresortie}`, 264, 153, 11)
+    drawText(profile.city, 110, 233, 11)
+    drawText(`${profile.datesortie}`, 95, 215, 11)
+    drawText(`${profile.heuresortie}`, 284, 215, 11)
 
     // TODO drawImage, signature pad ?
-    drawText(`${profile.signature}`, 150, 110, 20)
+    drawText(`${profile.signature}`, 150, 170, 20)
 
     const opts = { errorCorrectionLevel: 'M', type: 'image/png', quality: 0.92, margin: 1 }
     const generatedQR = await QRCode.toDataURL(data, opts)
 
     const qrImage = await pdfDoc.embedPng(generatedQR)
 
-    page1.drawImage(qrImage, { x: page1.getWidth() - 156, y: 100, width: 92, height: 92 })
+    page1.drawImage(qrImage, { x: page1.getWidth() - 170, y: 140, width: 120, height: 120 })
 
-    pdfDoc.addPage()
-    const page2 = pdfDoc.getPages()[1]
-    page2.drawImage(qrImage, { x: 50, y: page2.getHeight() - 350, width: 300, height: 300 })
+    // pdfDoc.addPage()
+    // const page2 = pdfDoc.getPages()[1]
+    // page2.drawImage(qrImage, { x: 50, y: page2.getHeight() - 350, width: 300, height: 300 })
 
     return pdfDoc.save()
 }
