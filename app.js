@@ -14,12 +14,12 @@ const start = async () => {
     const reasons = "achats"
 
     profile.datesortie = `${("0" + (now.getDay() + 1)).slice(-2)}/${("0" + (now.getMonth() + 1)).slice(-2)}/${now.getFullYear()}`
-    profile.heuresortie = `${now.getHours()}:${now.getMinutes()}`
+    profile.heuresortie = `${("0" + now.getHours()).slice(-2)}:${("0" + now.getMinutes()).slice(-2)}`
 
     console.log(profile, reasons)
-    const pdfBytes = await generatePdf(profile, reasons, './certificate.pdf')
+    const pdfBytes = await generatePdf(profile, reasons, './templates/certificate.pdf')
 
-    const fileName = "docs/attestation.pdf" // `docs/attestation-${creationDate}_${creationHour}.pdf`
+    const fileName = "./docs/attestation.pdf" // `docs/attestation-${creationDate}_${creationHour}.pdf`
     await writeFile(fileName, pdfBytes)
 }
 
@@ -54,9 +54,7 @@ async function generatePdf(profile, reasons, pdfBase) {
     const page1 = pdfDoc.getPages()[0]
 
     const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica)
-    const drawText = (text, x, y, size = 11) => {
-        page1.drawText(text, { x, y, size, font })
-    }
+    const drawText = (text, x, y, size = 11) => page1.drawText(text, { x, y, size, font })
 
     drawText(`${firstname} ${lastname}`, 119, 696)
     drawText(birthday, 119, 674)
@@ -69,10 +67,11 @@ async function generatePdf(profile, reasons, pdfBase) {
     drawText(`${profile.datesortie}`, 91, 153, 11)
     drawText(`${profile.heuresortie}`, 264, 153, 11)
 
-    // TODO drawImage
+    // TODO drawImage, signature pad ?
     drawText(`${profile.signature}`, 150, 110, 20)
 
-    const generatedQR = await generateQR(data)
+    const opts = { errorCorrectionLevel: 'M', type: 'image/png', quality: 0.92, margin: 1 }
+    const generatedQR = await QRCode.toDataURL(data, opts)
 
     const qrImage = await pdfDoc.embedPng(generatedQR)
 
@@ -82,12 +81,7 @@ async function generatePdf(profile, reasons, pdfBase) {
     const page2 = pdfDoc.getPages()[1]
     page2.drawImage(qrImage, { x: 50, y: page2.getHeight() - 350, width: 300, height: 300 })
 
-    return await pdfDoc.save()
-}
-
-async function generateQR(text) {
-    const opts = { errorCorrectionLevel: 'M', type: 'image/png', quality: 0.92, margin: 1 }
-    return QRCode.toDataURL(text, opts)
+    return pdfDoc.save()
 }
 
 start()
