@@ -4,7 +4,7 @@ Version Node.js du générateur d'attestation Q4.
 
 Créer un fichier `profile.json` sur ce modèle :
 ```sh
-$ cat profile.json 
+$ cat profile.json
 {
   "address": "15 place Vendome",
   "birthday": "25/08/1930",
@@ -28,3 +28,4 @@ $ open docs/attestation.pdf
 
 - [`nesk/covid-19-certificate`](https://github.com/nesk/covid-19-certificate), Johann Pardanaud
 - [`LAB-MI/attestation-deplacement-derogatoire-q4-2020`](https://github.com/LAB-MI/attestation-deplacement-derogatoire-q4-2020)
+- [Numerama - Comment fonctionne CovidReader ?](https://www.numerama.com/tech/615990-attestation-de-deplacement-numerique-comment-fonctionne-covidreader-lapplication-des-policiers.html)
