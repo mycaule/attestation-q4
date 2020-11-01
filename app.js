@@ -10,21 +10,16 @@ const writeFile = util.promisify(fs.writeFile)
 const profile = require('./profile.json')
 
 const start = async () => {
-    const creationInstant = new Date()
-    const creationDate = creationInstant.toLocaleDateString('fr-CA')
-    const creationHour = creationInstant
-        .toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-        .replace(':', '-')
-
+    const now = new Date()
     const reasons = "achats"
 
-    profile.datesortie = creationInstant.toLocaleDateString('fr-FR')
-    profile.heuresortie = creationInstant.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    profile.datesortie = `${("0" + (now.getDay() + 1)).slice(-2)}/${("0" + (now.getMonth() + 1)).slice(-2)}/${now.getFullYear()}`
+    profile.heuresortie = `${now.getHours()}:${now.getMinutes()}`
 
     console.log(profile, reasons)
     const pdfBytes = await generatePdf(profile, reasons, './certificate.pdf')
 
-    const fileName = `docs/attestation-${creationDate}_${creationHour}.pdf`
+    const fileName = "docs/attestation.pdf" // `docs/attestation-${creationDate}_${creationHour}.pdf`
     await writeFile(fileName, pdfBytes)
 }
 
@@ -41,12 +36,6 @@ const ys = {
 }
 
 async function generatePdf(profile, reasons, pdfBase) {
-    const creationInstant = new Date()
-    const creationDate = creationInstant.toLocaleDateString('fr-FR')
-    // const creationHour = creationInstant
-    //     .toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-    //     .replace(':', 'h')
-
     const {
         lastname,
         firstname,
@@ -60,7 +49,7 @@ async function generatePdf(profile, reasons, pdfBase) {
     } = profile
 
     const data = [
-        `Cree le: ${creationDate} a 06h05`,
+        `Cree le: ${datesortie} a 06h05`,
         `Nom: ${lastname}`,
         `Prenom: ${firstname}`,
         `Naissance: ${birthday} a ${placeofbirth}`,
@@ -102,16 +91,14 @@ async function generatePdf(profile, reasons, pdfBase) {
     drawText(placeofbirth, 297, 674)
     drawText(`${address} ${zipcode} ${city}`, 133, 652)
 
-    reasons.split(', ')
-        .forEach(reason => {
-            drawText('x', 78, ys[reason], 18)
-        })
+    reasons.split(', ').forEach(reason => drawText('x', 78, ys[reason], 18))
 
-    let locationSize = getIdealFontSize(font, profile.city, 83, 7, 11)
-
-    drawText(profile.city, 105, 177, locationSize)
+    drawText(profile.city, 105, 177, 11)
     drawText(`${profile.datesortie}`, 91, 153, 11)
     drawText(`${profile.heuresortie}`, 264, 153, 11)
+
+    // TODO drawImage
+    drawText(`${profile.signature}`, 150, 110, 20)
 
     const generatedQR = await generateQR(data)
 
@@ -134,17 +121,6 @@ async function generatePdf(profile, reasons, pdfBase) {
     })
 
     return await pdfDoc.save()
-}
-
-function getIdealFontSize(font, text, maxWidth, minSize, defaultSize) {
-    let currentSize = defaultSize
-    let textWidth = font.widthOfTextAtSize(text, defaultSize)
-
-    while (textWidth > maxWidth && currentSize > minSize) {
-        textWidth = font.widthOfTextAtSize(text, --currentSize)
-    }
-
-    return textWidth > maxWidth ? null : currentSize
 }
 
 async function generateQR(text) {
