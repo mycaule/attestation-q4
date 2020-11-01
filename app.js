@@ -23,30 +23,10 @@ const start = async () => {
     await writeFile(fileName, pdfBytes)
 }
 
-const ys = {
-    travail: 578,
-    achats: 533,
-    sante: 477,
-    famille: 435,
-    handicap: 396,
-    sport_animaux: 358,
-    convocation: 295,
-    missions: 255,
-    enfants: 211,
-}
-
 async function generatePdf(profile, reasons, pdfBase) {
-    const {
-        lastname,
-        firstname,
-        birthday,
-        placeofbirth,
-        address,
-        zipcode,
-        city,
-        datesortie,
-        heuresortie,
-    } = profile
+    const ys = { travail: 578, achats: 533, sante: 477, famille: 435, handicap: 396, sport_animaux: 358, convocation: 295, missions: 255, enfants: 211 }
+
+    const { lastname, firstname, birthday, placeofbirth, address, zipcode, city, datesortie, heuresortie } = profile
 
     const data = [
         `Cree le: ${datesortie} a 06h05`,
@@ -66,15 +46,7 @@ async function generatePdf(profile, reasons, pdfBase) {
 
     pdfDoc.setTitle('COVID-19 - Déclaration de déplacement')
     pdfDoc.setSubject('Attestation de déplacement dérogatoire')
-    pdfDoc.setKeywords([
-        'covid19',
-        'covid-19',
-        'attestation',
-        'déclaration',
-        'déplacement',
-        'officielle',
-        'gouvernement',
-    ])
+    pdfDoc.setKeywords(['covid19', 'covid-19', 'attestation', 'déclaration', 'déplacement', 'officielle', 'gouvernement'])
     pdfDoc.setProducer('DNUM/SDIT')
     pdfDoc.setCreator('')
     pdfDoc.setAuthor("Ministère de l'intérieur")
@@ -104,32 +76,17 @@ async function generatePdf(profile, reasons, pdfBase) {
 
     const qrImage = await pdfDoc.embedPng(generatedQR)
 
-    page1.drawImage(qrImage, {
-        x: page1.getWidth() - 156,
-        y: 100,
-        width: 92,
-        height: 92,
-    })
+    page1.drawImage(qrImage, { x: page1.getWidth() - 156, y: 100, width: 92, height: 92 })
 
     pdfDoc.addPage()
     const page2 = pdfDoc.getPages()[1]
-    page2.drawImage(qrImage, {
-        x: 50,
-        y: page2.getHeight() - 350,
-        width: 300,
-        height: 300,
-    })
+    page2.drawImage(qrImage, { x: 50, y: page2.getHeight() - 350, width: 300, height: 300 })
 
     return await pdfDoc.save()
 }
 
 async function generateQR(text) {
-    const opts = {
-        errorCorrectionLevel: 'M',
-        type: 'image/png',
-        quality: 0.92,
-        margin: 1,
-    }
+    const opts = { errorCorrectionLevel: 'M', type: 'image/png', quality: 0.92, margin: 1 }
     return QRCode.toDataURL(text, opts)
 }
 
