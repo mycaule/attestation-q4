@@ -65,9 +65,9 @@ async function generatePdf(profile, reasons, pdfBase, signatureBase = undefined)
 
     reasons.forEach(reason => drawText('x', 72, ys[reason], 18))
 
-    drawText(profile.city, 110, 233, 11)
-    drawText(`${profile.datesortie}`, 95, 215, 11)
-    drawText(`${profile.heuresortie}`, 284, 215, 11)
+    drawText(profile.city, 110, 233)
+    drawText(`${profile.datesortie}`, 95, 215)
+    drawText(`${profile.heuresortie}`, 284, 215)
 
     if (signatureBase) {
         const signatureBytes = await readFile(signatureBase)
