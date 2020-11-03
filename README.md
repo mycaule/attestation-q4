@@ -17,6 +17,10 @@ $ cat profile.json
 }
 ```
 
+Optionnel: créer un fichier `signature.png`, par exemple avec [Signature Pad](http://szimek.github.io/signature_pad/).
+
+Puis lancer le script !
+
 ```sh
 $ npm install
 $ npm start
