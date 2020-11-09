@@ -13,7 +13,7 @@ const start = async () => {
     const now = new Date()
     const reasons = ["achats"]
 
-    profile.datesortie = `${("0" + (now.getDay() + 1)).slice(-2)}/${("0" + (now.getMonth() + 1)).slice(-2)}/${now.getFullYear()}`
+    profile.datesortie = `${("0" + (now.getDate())).slice(-2)}/${("0" + (now.getMonth() + 1)).slice(-2)}/${now.getFullYear()}`
     profile.heuresortie = `${("0" + now.getHours()).slice(-2)}:${(Math.floor(now.getMinutes() / 10) + "0")}`
 
     console.log(profile, reasons)
