@@ -21,7 +21,7 @@ const start = async () => {
     const signatureName = "./signature.png"
     const pdfBytes = await generatePdf(profile, reasons, templateName, signatureName)
 
-    const fileName = "./docs/attestation.pdf" // `docs/attestation-${creationDate}_${creationHour}.pdf`
+    const fileName = "./docs/attestation.pdf"
     await writeFile(fileName, pdfBytes)
 }
 
