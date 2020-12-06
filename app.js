@@ -11,13 +11,13 @@ const profile = require('./profile.json')
 
 const start = async () => {
     const now = new Date()
-    const reasons = ["achats"]
+    const reasons = ["achats_culturel_cultuel"]
 
     profile.datesortie = `${("0" + (now.getDate())).slice(-2)}/${("0" + (now.getMonth() + 1)).slice(-2)}/${now.getFullYear()}`
     profile.heuresortie = `${("0" + now.getHours()).slice(-2)}:${(Math.floor(now.getMinutes() / 10) + "0")}`
 
     console.log(profile, reasons)
-    const templateName = "./templates/certificate01.pdf"
+    const templateName = "./templates/certificate02.pdf"
     const signatureName = "./signature.png"
     const pdfBytes = await generatePdf(profile, reasons, templateName, signatureName)
 
@@ -26,7 +26,10 @@ const start = async () => {
 }
 
 async function generatePdf(profile, reasons, pdfBase, signatureBase = undefined) {
-    const ys = { travail: 585, achats: 536, sante: 488, famille: 451, handicap: 415, sport_animaux: 391, convocation: 318, missions: 293, enfants: 269 }
+    const ys = {
+        travail: 553, achats_culturel_cultuel: 482, sante: 434, famille: 410, handicap: 373,
+        sport_animaux: 349, convocation: 276, missions: 252, enfants: 228,
+    }
 
     const { lastname, firstname, birthday, placeofbirth, address, zipcode, city, datesortie, heuresortie } = profile
 
@@ -58,16 +61,16 @@ async function generatePdf(profile, reasons, pdfBase, signatureBase = undefined)
     const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica)
     const drawText = (text, x, y, size = 11) => page1.drawText(text, { x, y, size, font })
 
-    drawText(`${firstname} ${lastname}`, 137, 701)
-    drawText(birthday, 137, 683)
-    drawText(placeofbirth, 200, 683)
-    drawText(`${address} ${zipcode} ${city}`, 137, 664)
+    drawText(`${firstname} ${lastname}`, 92, 702)
+    drawText(birthday, 92, 684)
+    drawText(placeofbirth, 214, 684)
+    drawText(`${address} ${zipcode} ${city}`, 104, 665)
 
-    reasons.forEach(reason => drawText('x', 72, ys[reason], 18))
+    reasons.forEach(reason => drawText('x', 47, ys[reason], 12))
 
-    drawText(profile.city, 110, 233)
-    drawText(`${profile.datesortie}`, 95, 215)
-    drawText(`${profile.heuresortie}`, 284, 215)
+    drawText(profile.city, 78, 76)
+    drawText(`${profile.datesortie}`, 63, 58)
+    drawText(`${profile.heuresortie}`, 227, 58)
 
     if (signatureBase) {
         const signatureBytes = await readFile(signatureBase)
@@ -82,11 +85,11 @@ async function generatePdf(profile, reasons, pdfBase, signatureBase = undefined)
 
     const qrImage = await pdfDoc.embedPng(generatedQR)
 
-    page1.drawImage(qrImage, { x: page1.getWidth() - 170, y: 140, width: 120, height: 120 })
+    page1.drawImage(qrImage, { x: page1.getWidth() - 156, y: 25, width: 92, height: 92 })
 
     pdfDoc.addPage()
     const page2 = pdfDoc.getPages()[1]
-    page2.drawImage(qrImage, { x: 50, y: page2.getHeight() - 350, width: 300, height: 300 })
+    page2.drawImage(qrImage, { x: 50, y: page2.getHeight() - 390, width: 300, height: 300 })
 
     return pdfDoc.save()
 }
